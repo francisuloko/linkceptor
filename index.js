@@ -1,31 +1,46 @@
-<script>
-  // Wait for the document to fully load
-  document.addEventListener('DOMContentLoaded', function() {
-    // Get all the links on the page
-    var links = document.getElementsByTagName('a');
+function interceptLinkClicks() {
+  // Get all links on the page
+  var links = document.querySelectorAll("a");
 
-    // Loop through each link
-    for (var i = 0; i < links.length; i++) {
-      var link = links[i];
+  // Loop through the links
+  for (var i = 0; i < links.length; i++) {
+    // Check if the link is external
+    if (links[i].href.indexOf("http://") === 0 || links[i].href.indexOf("https://") === 0) {
+      // Add an event listener to the link
+      links[i].addEventListener("click", function(event) {
+        // Prevent the default action from happening
+        event.preventDefault();
 
-      // Check if the link is an external or referral link
-      if (link.hostname !== window.location.hostname) {
-        // Intercept the click event
-        link.addEventListener('click', function(event) {
-          event.preventDefault(); // Prevent the link from opening normally
+        // Create an iframe
+        var iframe = document.createElement("iframe");
 
-          // Create an iframe element
-          var iframe = document.createElement('iframe');
-          iframe.src = this.href;
-          iframe.style.width = '100%';
-          iframe.style.height = '100vh';
-          iframe.style.border = 'none';
-          iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts');
-          
-          // Replace the link with the iframe
-          this.parentNode.replaceChild(iframe, this);
-        });
-      }
+        // Set the iframe's src to the link's href
+        iframe.src = this.href;
+
+        // Append the iframe to the body
+        document.body.appendChild(iframe);
+      });
     }
-  });
-</script>
+  }
+}
+
+// Add a function to close the iframe
+function closeIframe() {
+  // Get all iframes on the page
+  var iframes = document.querySelectorAll("iframe");
+
+  // Loop through the iframes
+  for (var i = 0; i < iframes.length; i++) {
+    // Check if the iframe is visible
+    if (iframes[i].style.display !== "none") {
+      // Remove the iframe from the page
+      document.body.removeChild(iframes[i]);
+    }
+  }
+}
+
+// Add the interceptLinkClicks() function to the window object
+window.interceptLinkClicks = interceptLinkClicks;
+
+// Add the closeIframe() function to the window object
+window.closeIframe = closeIframe;
